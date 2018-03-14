@@ -10,7 +10,7 @@ public:
     Str() { }
 
     // create a Str containing n copies of c
-    Str(size_type n, char c) : data(n, c) { }
+    Str(size_t n, char c) : data(n, c) { }
 
     // create a Str from a null-terminated array of char
     Str(const char* cp) { 
@@ -21,6 +21,9 @@ public:
     template <class In> Str(In b, In e) { 
         std::copy(b, e, std::back_inserter(data)); 
     }
+
+    char& operator[](size_t i) { return data[i]; }
+    const char& operator[](size_t i) const { return data[i]; }
 
 private:
     Vec<char> data;
