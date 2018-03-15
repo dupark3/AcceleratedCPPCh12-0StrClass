@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "Str.h"
+
 int main()
 {
 
