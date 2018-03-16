@@ -1,7 +1,10 @@
 #ifndef GUARD_Str_h
 #define GUARD_Str_h
 
+#include <algorithm> // copy
+#include <cstring> // strlen
 #include <iostream>
+#include <iterator> // back_inserter
 
 #include "Vec.h"
 
@@ -9,61 +12,43 @@ class Str{
 public:
 typedef size_t size_type;
 
-// CONSTRUCTORS
-    // default constructor
+    // CONSTRUCTORS
     Str() { }
-    
-    // create a Str containing n copies of c
     Str(size_t n, char c) : data(n, c) { }
-
-    // create a Str from a null-terminated array of char
-    Str(const char* cp) { 
-        std::copy(cp, cp+ std::strlen(cp), std::back_inserter(data)); 
-    } 
-
-    // create a Str from a range denoted by iterators b and e
-    template <class In> Str(In b, In e) { 
-        std::copy(b, e, std::back_inserter(data)); 
+    Str(const char* cp) {
+        std::copy(cp, cp+ std::strlen(cp), std::back_inserter(data));
+    }
+    template <class In> Str(In b, In e) {
+        std::copy(b, e, std::back_inserter(data));
     }
 
-// OPERATOR OVERLOAD
+    // OPERATOR OVERLOADS
     char& operator[](size_t i) { return data[i]; }
     const char& operator[](size_t i) const { return data[i]; }
+    friend std::istream& operator>>(std::istream&, Str&);
+    Str& operator+=(const Str& rvalue) {
+        std::copy(rvalue.data.begin(), rvalue.data.end(), std::back_inserter(data));
+        return *this;
+        /*for (size_t i = 0; i != rvalue.size(); ++i)
+            data.push_back(rvalue(i));*/
+    }
 
-// MEMBER FUNCTIONS
-    size_t size() { return data.size() }
+    // MEMBER FUNCTIONS
+    size_t size() { return data.size(); }
+    const size_t size() const { return data.size(); }
+    char* begin() { return data.begin(); }
+    const char* begin() const { return data.begin(); }
+    char* end() { return data.end(); }
+    const char* end() const { return data.end(); }
 
 private:
     Vec<char> data;
 };
 
-// INPUT AND OUTPUT NONMEMBER FUNCTIONS 
-std::ostream& operator<<(std::ostream& os, const Str& s){
-    for(Str::size_type i = 0; i < s.size(); ++i)
-        os << s[i];
-    return os;
-}
+// OUTPUT NONMEMBER FUNCTION
+std::ostream& operator<<(std::ostream&, const Str&);
 
-std::istream& operator>>(std::istream& is, const Str& s){
-    // obliterate existing values
-    s.data.clear();
-
-    // read nad discard leading whitespace
-    char c;
-    while (is.get(c) && isspace(c))
-        ; // nothing to do, just test the condition
-
-    // if something still to read, do so until next whitespace character
-    if (is){
-        do s.data.push_back(c);
-        while(is.get(c) && !isspace(c));
-
-        // if we read whitspace, then put it back on the stream
-        if (is)
-            is.unget();
-    }
-
-    return is;
-}
+// CONCATENATE NONMEMBER FUNCTION
+Str& operator+ (const Str&, const Str& );
 
 #endif // GUARD_Str_h
